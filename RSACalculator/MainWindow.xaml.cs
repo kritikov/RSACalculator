@@ -24,7 +24,6 @@ namespace RSACalculator
         {
             InitializeComponent();
 
-
             try
             {
                 //Create a UnicodeEncoder to convert between byte array and string.
@@ -47,18 +46,17 @@ namespace RSACalculator
                     BigInteger f_n = (p - 1) * (q - 1);
                     BigInteger d = ModInverse(e, f_n);
 
-                    //var f = ModInverse(e, f_n);
-
+                    var number = StringToNumber("string");
+                    var text = NumberToString(number);
 
                     BigInteger m = 32;
-                    var bytes = Encoding.UTF8.GetBytes("Nick Kritikou");
+
                     //var m = new BigInteger(bytes.Concat(new byte[] { 0 }).ToArray());
                     var c = Encrypt(m, n, e);
                     var m_ = Decrypt(c, d, n);
 
 
-                    var parameters = Create(p.ToByteArray(), q.ToByteArray(), e.ToByteArray(), n.ToByteArray());
-
+                    //var parameters = Create(p.ToByteArray(), q.ToByteArray(), e.ToByteArray(), n.ToByteArray());
                     //var parameters = new RSAParameters
                     //{
                     //    P = p.ToByteArray(),
@@ -100,6 +98,69 @@ namespace RSACalculator
             }
 
         }
+
+        public static BigInteger StringToNumber(string text)
+        {
+            var bytes = Encoding.UTF8.GetBytes(text);
+            Array.Reverse(bytes);
+            var number = new BigInteger(bytes); //126943972912743
+
+            return number;
+        }
+
+        public static string NumberToString(BigInteger number)
+        {
+            byte[] bytes = number.ToByteArray();
+            Array.Reverse(bytes);
+            var text = Encoding.Default.GetString(bytes);
+
+            return text;
+        }
+
+        private static BigInteger Encrypt(BigInteger m, BigInteger n, BigInteger e)
+        {
+            return BigInteger.ModPow(m, e, n);
+        }
+
+        private static BigInteger Decrypt(BigInteger c, BigInteger d, BigInteger n)
+        {
+            return BigInteger.ModPow(c, d, n);
+        }
+
+        /// <summary>
+        /// Calculates the modular multiplicative inverse of <paramref name="a"/> modulo <paramref name="m"/>
+        /// using the extended Euclidean algorithm.
+        /// </summary>
+        /// <remarks>
+        /// This implementation comes from the pseudocode defining the inverse(a, n) function at
+        /// https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
+        /// </remarks>
+        public static BigInteger ModInverse(BigInteger a, BigInteger n)
+        {
+            BigInteger t = 0, nt = 1, r = n, nr = a;
+
+            if (n < 0)
+                n = -n;
+
+            if (a < 0)
+                a = n - (-a % n);
+
+            while (nr != 0)
+            {
+                var quot = r / nr;
+
+                var tmp = nt; nt = t - quot * nt; t = tmp;
+                tmp = nr; nr = r - quot * nr; r = tmp;
+            }
+
+            if (r > 1) throw new ArgumentException(nameof(a) + " is not convertible.");
+            if (t < 0) t = t + n;
+            return t;
+        }
+
+
+
+
 
         public static byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
         {
@@ -205,42 +266,6 @@ namespace RSACalculator
             };
         }
 
-
-        /// <summary>
-        /// Calculates the modular multiplicative inverse of <paramref name="a"/> modulo <paramref name="m"/>
-        /// using the extended Euclidean algorithm.
-        /// </summary>
-        /// <remarks>
-        /// This implementation comes from the pseudocode defining the inverse(a, n) function at
-        /// https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
-        /// </remarks>
-        public static BigInteger ModInverse(BigInteger a, BigInteger n)
-        {
-            BigInteger t = 0, nt = 1, r = n, nr = a;
-
-            if (n < 0)
-            {
-                n = -n;
-            }
-
-            if (a < 0)
-            {
-                a = n - (-a % n);
-            }
-
-            while (nr != 0)
-            {
-                var quot = r / nr;
-
-                var tmp = nt; nt = t - quot * nt; t = tmp;
-                tmp = nr; nr = r - quot * nr; r = tmp;
-            }
-
-            if (r > 1) throw new ArgumentException(nameof(a) + " is not convertible.");
-            if (t < 0) t = t + n;
-            return t;
-        }
-
         private static byte[] CopyAndReverse(byte[] data)
         {
             byte[] reversed = new byte[data.Length];
@@ -251,14 +276,6 @@ namespace RSACalculator
 
 
 
-        private static BigInteger Encrypt(BigInteger m, BigInteger n, BigInteger e)
-        {
-            return BigInteger.ModPow(m, e, n);
-        }
-
-        private static BigInteger Decrypt(BigInteger mEnc, BigInteger d, BigInteger n)
-        {
-            return BigInteger.ModPow(mEnc, d, n);
-        }
+       
     }
 }
