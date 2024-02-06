@@ -89,8 +89,7 @@ namespace RSACalculator
             }
             catch (ArgumentNullException)
             {
-                //Catch this exception in case the encryption did
-                //not succeed.
+                //Catch this exception in case the encryption did not succeed.
                 Console.WriteLine("routine failed.");
             }
         }
