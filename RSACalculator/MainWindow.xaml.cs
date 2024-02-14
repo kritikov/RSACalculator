@@ -52,7 +52,7 @@ namespace RSACalculator
                 string eString = "65537";
                 string cString = "76578687539749270334567433327419068016846482753554386520492865010545019207873571124020033190161215682615446396410129994711325892805940645283340607450605814292242214864807736616366963263577528008848595692050559543833562773099105599921926111989644313805176327043401089098178374013481826785604433013115807761169019821323105749924330624040032176017861852570855402207200857443405652874317191870029368327928342025351921450031345537488126081651667235334445880387925966636557003621257916083406394805099048054073995341365825171820787167114782405887040220243880710430205621846850135276025997937602400232787790214801902431955984378";
 
-                List<int> primes = new List<int>() { 1399, 6779, 13183, 13297, 22469, 33721, 37993, 38569, 42359, 45307, 55001, 63353, 81373, 87179, 97397, 105929,
+                List<int> factors = new List<int>() { 1399, 6779, 13183, 13297, 22469, 33721, 37993, 38569, 42359, 45307, 55001, 63353, 81373, 87179, 97397, 105929,
                     108223, 110479, 112757, 136189, 145303, 150893, 181273, 183473, 191929, 201961, 204133, 206821, 208511, 221581, 232877, 245071, 258023, 276083, 304961, 319427,
                     324931, 356803, 387449, 402343, 412637, 442517, 453671, 455809, 468491, 483853, 488947, 493049, 498053, 507029, 524269, 535103, 539293, 562019, 576899, 587173,
                     588871, 613747, 629281, 654803, 666013, 694079, 703561, 717047, 725099, 746129, 749893, 751021, 762599, 794077, 805537, 824419, 839633, 840611, 873497, 874091,
@@ -64,28 +64,25 @@ namespace RSACalculator
                 BigInteger c = BigInteger.Parse(cString);
 
                 BigInteger f_n = 1;
-                foreach(var prime in primes)
+                foreach(var prime in factors)
                     f_n *= prime - 1;
 
                 BigInteger d = ModInverse(e, f_n);
 
                 var m = Decrypt(c, d, n);
                 string result = NumberToString(m);
-                MessageBox.Show(result + "\n" + d.ToString());
+                MessageBox.Show(result + "\n\nd = " + d.ToString());
             }
             catch (ArgumentNullException)
             {
-                //Catch this exception in case the encryption did not succeed.
                 Console.WriteLine("routine failed.");
             }
         }
 
-        public static string TryDecrypt2()
+        public static void TryDecrypt2()
         {
             try
             {
-                string result = "not executed";
-
                 string nString = "18784930108456612406607814982869320937100357623565293065520882099446807661280672536412900261980252211590001129415416692842708423735233445954982126337452630953642389398728359447338862517090153799904393322766932296070412642108354965913688213429893600565940214997335063029350129915211361225154608407197811535838113388016141398750885113342334046258520069354875722557429638792502313832152491728469179017286106563712702581115089781944984882457716639211444194974007013843331628459682686708234290546709545912155519705333002154730995212015948695451676666505480477641054802308304079577983185418820145281416757335093826951423117";
                 string eString = "10706997089278343179826885210060827147463409493523510777431387685771671442851399238492089215565793886478149477207867523308649570870806078530234678604755861159531961701795254771192002888524222172978592793668157761774276617760632894679477733512701268203499385472869419715289158276662873644519187935785549641679751291116387452539507235136056210643936490424871113629840892783091758193454166139128577293272832880405477781482386734589325917451384947487161071406557141600567159179305543501912418793324336259009277406706410254025135571209187854192795599940361924030053346219417234844146017500403546598659553371609984800535467";
                 string cString = "15197314651067757355946584379946834164931969541043120164078064085944642365278681324096893476214152328730756513591485443945964837192597487877625274868334436921605239988927931381505891228509512463939955833545400394889094131125180282146395678844330453848518996586269025617541770111167605227113505192399546564506354156746766953521298852057983986116832842122594930311561489326839768342790373109683646472371945983378497288646413872942727101686965536906488145794402081854686784352899478311196208601541472632958619970624634811042002621463373384931741642559063446141175096440251352453487199537100563902295374105432210649258622";
@@ -98,7 +95,6 @@ namespace RSACalculator
                 BigInteger a = e;
                 BigInteger b = n;
                 List<BigInteger> numbers = new List<BigInteger>();
-                List<string> results = new List<string>();
                 do
                 {
                     divResult = Division(a, b);
@@ -112,7 +108,7 @@ namespace RSACalculator
                     var res = CalcContinuedFraction(numbers);
                     BigInteger d = res.denominator;
                     var m = Decrypt(c, d, n);
-                    result = NumberToString(m);
+                    string result = NumberToString(m);
 
                     if (result[0] >= 0 && result[0] <= 255 &&
                         result[1] >= 0 && result[1] <= 255 &&
@@ -126,18 +122,16 @@ namespace RSACalculator
                         result[9] >= 0 && result[9] <= 255 &&
                         result[10] >= 0 && result[10] <= 255)
                     {
-                        MessageBox.Show(result + "\n" + d.ToString());
+                        MessageBox.Show(result + "\n\nd = " + d.ToString());
                         break;
                     }
 
                 } while (divResult.remainder != 0);
 
-                return result;
             }
             catch (ArgumentNullException)
             {
                 Console.WriteLine("routine failed.");
-                return "";
             }
         }
 
@@ -153,50 +147,26 @@ namespace RSACalculator
         }
 
         /// <summary>
-        /// υπολογισμός του a1 + b1/b2 σε κλάσμα
+        ///  υπολογισμός του a + b/(c1/c2) σε κλάσμα
         /// </summary>
-        public static (BigInteger numerator, BigInteger denominator) CalcFraction(BigInteger a1, BigInteger b1, BigInteger b2)
+        public static (BigInteger numerator, BigInteger denominator) CalcFraction(BigInteger a, BigInteger b, (BigInteger c1, BigInteger c2) c)
         {
             BigInteger numerator, denominator;
 
-            if (b1 % b2 == 0)
+            b = b * c.c2;
+
+            if (b % c.c1 == 0)
             {
-                numerator = a1 + b1 / b2;
+                numerator = a + b / c.c1;
                 denominator = 1;
 
                 return (numerator, denominator);
             }
             else
             {
-                numerator = a1 * b2;
-                numerator = numerator + b1;
-                denominator = b2;
-
-                return (numerator, denominator);
-            }
-        }
-
-        /// <summary>
-        ///  υπολογισμός του a1 + b1/(b2/b3) σε κλάσμα
-        /// </summary>
-        public static (BigInteger numerator, BigInteger denominator) CalcFraction(BigInteger a1, BigInteger b1, (BigInteger b2, BigInteger b3) c)
-        {
-            BigInteger numerator, denominator;
-
-            b1 = b1 * c.b3;
-
-            if (b1 % c.b2 == 0)
-            {
-                numerator = a1 + b1 / c.b2;
-                denominator = 1;
-
-                return (numerator, denominator);
-            }
-            else
-            {
-                numerator = a1 * c.b2;
-                numerator = numerator + b1;
-                denominator = c.b2;
+                numerator = a * c.c1;
+                numerator = numerator + b;
+                denominator = c.c1;
 
                 return (numerator, denominator);
             }
