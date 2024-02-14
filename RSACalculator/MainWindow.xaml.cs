@@ -31,16 +31,18 @@ namespace RSACalculator
         public MainWindow()
         {
             InitializeComponent();
-
-            try
-            {
-                TryDecrypt2();
-            }
-            catch (ArgumentNullException)
-            {
-                Console.WriteLine("Encryption failed.");
-            }
         }
+
+        private void Question1_Click(object sender, RoutedEventArgs e)
+        {
+            TryDecrypt1();
+        }
+
+        private void Question2_Click(object sender, RoutedEventArgs e)
+        {
+            TryDecrypt2();
+        }
+
 
         public static void TryDecrypt1()
         {
@@ -69,7 +71,7 @@ namespace RSACalculator
 
                 var m = Decrypt(c, d, n);
                 string result = NumberToString(m);
-                MessageBox.Show(result);
+                MessageBox.Show(result + "\n" + d.ToString());
             }
             catch (ArgumentNullException)
             {
@@ -124,8 +126,8 @@ namespace RSACalculator
                         result[9] >= 0 && result[9] <= 255 &&
                         result[10] >= 0 && result[10] <= 255)
                     {
-                        results.Add(result);
-                        results.Add(d.ToString());
+                        MessageBox.Show(result + "\n" + d.ToString());
+                        break;
                     }
 
                 } while (divResult.remainder != 0);
@@ -287,5 +289,6 @@ namespace RSACalculator
             return t;
         }
 
+    
     }
 }
