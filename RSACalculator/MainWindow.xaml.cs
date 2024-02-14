@@ -13,6 +13,8 @@ using System.Numerics;
 using System.Reflection;
 using System.Collections;
 using static System.Net.Mime.MediaTypeNames;
+using System.Collections.Specialized;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace RSACalculator
 {
@@ -105,40 +107,34 @@ namespace RSACalculator
                 BigInteger e = BigInteger.Parse(eString);
                 BigInteger c = BigInteger.Parse(cString);
 
+
+                //var res = CalcFraction(1, 1, (4, 1));
+                //List<BigInteger> numbers1 = new List<BigInteger>() { 2, 3, 1, 4 };
+                //var res = CalcContinuedFraction(numbers1);
+
                 (BigInteger result, BigInteger remainder) divResult = new(0, 1);
                 BigInteger a = e;
                 BigInteger b = n;
-                List<BigInteger> fractions = new List<BigInteger>();
+                List<BigInteger> numbers = new List<BigInteger>();
+                List<string> results = new List<string>();
                 do
                 {
                     divResult = ContinuedFraction(a, b);
-                    fractions.Add(divResult.result);
+                    numbers.Add(divResult.result);
                     if (divResult.remainder > 0)
                     {
                         a = b;
                         b = divResult.remainder;
                     }
 
+                    var res = CalcContinuedFraction(numbers);
+                    BigInteger d = res.denominator;
+                    var m = Decrypt(c, d, n);
+                    result = NumberToString(m);
+                    results.Add(result);
+
+
                 } while (divResult.remainder != 0);
-
-                string continuedFractionForm = "[";
-                foreach(var fraction in fractions) {
-                    if (fraction == 0)
-                        continuedFractionForm += fraction.ToString() + ";";
-                    else
-                        continuedFractionForm += $", {fraction}";
-                }
-                continuedFractionForm += "]";
-
-
-                string dString = "307869325835510787688524069612484920307056146930150004433690919118292559856477900390504867629494437942950259540439195729741900673563011132529115530608306238321279717447697414173693481186";
-                BigInteger d = BigInteger.Parse(dString);
-
-                var m = Decrypt(c, d, n);
-                result = NumberToString(m);
-                MessageBox.Show(result);
-
-                List<string> results = new List<string>();
 
                 return result;
             }
@@ -157,6 +153,70 @@ namespace RSACalculator
             var remainder = a % b;
 
             return (result, remainder);
+        }
+
+        // υπολογισμός του a1 + b1/b2 σε κλάσμα
+        public static (BigInteger numerator, BigInteger denominator) CalcFraction(BigInteger a1, BigInteger b1, BigInteger b2)
+        {
+            BigInteger numerator, denominator;
+
+            if (b1 % b2 == 0)
+            {
+                numerator = a1 + b1 / b2;
+                denominator = 1;
+
+                return (numerator, denominator);
+            }
+            else
+            {
+                numerator = a1 * b2;
+                numerator = numerator + b1;
+                denominator = b2;
+
+                return (numerator, denominator);
+            }
+        }
+
+        // υπολογισμός του a1 + b1/(b2/b3) σε κλάσμα
+        public static (BigInteger numerator, BigInteger denominator) CalcFraction(BigInteger a1, BigInteger b1, (BigInteger b2, BigInteger b3) c)
+        {
+            BigInteger numerator, denominator;
+
+            b1 = b1 * c.b3;
+
+            if (b1 % c.b2 == 0)
+            {
+                numerator = a1 + b1 / c.b2;
+                denominator = 1;
+
+                return (numerator, denominator);
+            }
+            else
+            {
+                numerator = a1 * c.b2;
+                numerator = numerator + b1;
+                denominator = c.b2;
+
+                return (numerator, denominator);
+            }
+        }
+
+        // υπολογισμός μιας ContinuedFraction
+        public static (BigInteger numerator, BigInteger denominator) CalcContinuedFraction(List<BigInteger> numbers)
+        {
+            (BigInteger numerator, BigInteger denominator) result = new (0, 0);
+            for (var i = numbers.Count-1; i >= 0; i--)
+            {
+                if (i == numbers.Count - 1)
+                {
+                    result = CalcFraction(numbers[i], 0, (1, 1));
+                }
+                else
+                {
+                    result = CalcFraction(numbers[i], 1, (result.numerator, result.denominator));
+                }
+            }
+            return result;
         }
 
         public static BigInteger Sqrt(BigInteger n)
@@ -179,7 +239,7 @@ namespace RSACalculator
             throw new ArithmeticException("NaN");
         }
 
-        private static Boolean isSqrt(BigInteger n, BigInteger root)
+        private static bool isSqrt(BigInteger n, BigInteger root)
         {
             BigInteger lowerBound = root * root;
             BigInteger upperBound = (root + 1) * (root + 1);
