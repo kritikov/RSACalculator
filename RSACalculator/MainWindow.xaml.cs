@@ -110,6 +110,7 @@ namespace RSACalculator
                     var m = Decrypt(c, d, n);
                     string result = NumberToString(m);
 
+                    // αν τα πρώτα 10 bytes αντιστοιχούν σε ASCII τότε το μήνυμα μάλλον βρέθηκε
                     if (result[0] >= 0 && result[0] <= 255 &&
                         result[1] >= 0 && result[1] <= 255 &&
                         result[2] >= 0 && result[2] <= 255 &&
