@@ -131,8 +131,22 @@ namespace RSACalculator
                     BigInteger d = res.denominator;
                     var m = Decrypt(c, d, n);
                     result = NumberToString(m);
-                    results.Add(result);
 
+                    if (result[0] >= 0 && result[0] <= 255 &&
+                        result[1] >= 0 && result[1] <= 255 &&
+                        result[2] >= 0 && result[2] <= 255 &&
+                        result[3] >= 0 && result[3] <= 255 &&
+                        result[4] >= 0 && result[4] <= 255 &&
+                        result[5] >= 0 && result[5] <= 255 &&
+                        result[6] >= 0 && result[6] <= 255 &&
+                        result[7] >= 0 && result[7] <= 255 &&
+                        result[8] >= 0 && result[8] <= 255 &&
+                        result[9] >= 0 && result[9] <= 255 &&
+                        result[10] >= 0 && result[10] <= 255)
+                    {
+                        results.Add(result);
+                        results.Add(d.ToString());
+                    }
 
                 } while (divResult.remainder != 0);
 
