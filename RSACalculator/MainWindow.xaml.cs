@@ -119,56 +119,26 @@ namespace RSACalculator
                         b = divResult.remainder;
                     }
 
-                    // calculate d
-                    BigInteger d = 0;
-                    int index = 0;
-                    foreach(var number in fractions)
-                    {
-                        if (index > 0)
-                        {
-                            d = 
-                            index++;
-                        }
-                    }
-
-
                 } while (divResult.remainder != 0);
 
-             
-              
+                string continuedFractionForm = "[";
+                foreach(var fraction in fractions) {
+                    if (fraction == 0)
+                        continuedFractionForm += fraction.ToString() + ";";
+                    else
+                        continuedFractionForm += $", {fraction}";
+                }
+                continuedFractionForm += "]";
+
+
+                string dString = "307869325835510787688524069612484920307056146930150004433690919118292559856477900390504867629494437942950259540439195729741900673563011132529115530608306238321279717447697414173693481186";
+                BigInteger d = BigInteger.Parse(dString);
+
+                var m = Decrypt(c, d, n);
+                result = NumberToString(m);
+                MessageBox.Show(result);
 
                 List<string> results = new List<string>();
-
-                //for (int i = 1; i <= 1000000; i++)
-                //{
-                //    BigInteger f_n = e + i;
-
-                //    try
-                //    {
-                //        BigInteger d = ModInverse(e, f_n);
-
-                //        var m = Decrypt(c, d, n);
-                //        result = NumberToString(m);
-
-                //        if (result[0] >= 0 && result[0] <= 255 &&
-                //            result[1] >= 0 && result[1] <= 255 &&
-                //            result[2] >= 0 && result[2] <= 255 &&
-                //            result[3] >= 0 && result[3] <= 255 &&
-                //            result[4] >= 0 && result[4] <= 255 &&
-                //            result[5] >= 0 && result[5] <= 255 &&
-                //            result[6] >= 0 && result[6] <= 255 &&
-                //            result[7] >= 0 && result[7] <= 255 &&
-                //            result[8] >= 0 && result[8] <= 255 &&
-                //            result[9] >= 0 && result[9] <= 255 &&
-                //            result[10] >= 0 && result[10] <= 255)
-                //            results.Add(result);
-                //    }
-                //    catch
-                //    {
-                //    }
-                //    //MessageBox.Show(result);
-                //}
-
 
                 return result;
             }
