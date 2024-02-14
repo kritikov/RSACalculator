@@ -28,35 +28,20 @@ namespace RSACalculator
             263, 269, 271, 277, 281, 283, 293, 307, 311, 313, 317, 331, 337, 347, 349, 353, 359, 367, 373, 379, 383, 389, 397, 401, 409, 419, 421, 431, 433, 
             439, 443, 449, 457, 461, 463, 467, 479, 487, 491, 499, 503, 509, 521, 523, 541 };
 
-
         public MainWindow()
         {
             InitializeComponent();
 
             try
             {
-                //BigInteger n = BigInteger.Parse("84641628266040968134726266858994621642842114704041843715900121029779624800354442181024933538554572539172519633298583132480574427234887384864237862510536135711979678422472297405718744900411759436052738392404109005261750528594360602400820678382015390265136033037813004859176942808586218232493968301780230653856757977924165795192647059713220241170741461160395394356567033643278968175549740103490059728058303074181319743641739740188742499285217435763085176127055686256451491791548801388560202149363758975803673725819798718410301085155062206092370667133063831263112034304132340281237240943617970645337927088718346956199378919");
-                //BigInteger e = BigInteger.Parse("65537");
-                //BigInteger m = StringToNumber("{Mother taught us patience, the virtues of restraint.}");
-                //var c = Encrypt(m, e, n);
-
                 TryDecrypt2();
-
-
             }
             catch (ArgumentNullException)
             {
-                //Catch this exception in case the encryption did
-                //not succeed.
                 Console.WriteLine("Encryption failed.");
             }
-
         }
 
-        /// <summary>
-        ///  try to decrypt the data of ergasia 3
-        /// </summary>
-        /// <returns></returns>
         public static void TryDecrypt1()
         {
             try
@@ -107,20 +92,15 @@ namespace RSACalculator
                 BigInteger e = BigInteger.Parse(eString);
                 BigInteger c = BigInteger.Parse(cString);
 
-
-                //var res = CalcFraction(1, 1, (4, 1));
-                //List<BigInteger> numbers1 = new List<BigInteger>() { 2, 3, 1, 4 };
-                //var res = CalcContinuedFraction(numbers1);
-
-                (BigInteger result, BigInteger remainder) divResult = new(0, 1);
+                (BigInteger quotient, BigInteger remainder) divResult = new(0, 1);
                 BigInteger a = e;
                 BigInteger b = n;
                 List<BigInteger> numbers = new List<BigInteger>();
                 List<string> results = new List<string>();
                 do
                 {
-                    divResult = ContinuedFraction(a, b);
-                    numbers.Add(divResult.result);
+                    divResult = Division(a, b);
+                    numbers.Add(divResult.quotient);
                     if (divResult.remainder > 0)
                     {
                         a = b;
@@ -154,22 +134,25 @@ namespace RSACalculator
             }
             catch (ArgumentNullException)
             {
-                //Catch this exception in case the encryption did
-                //not succeed.
                 Console.WriteLine("routine failed.");
                 return "";
             }
         }
 
-        public static (BigInteger result, BigInteger remainder) ContinuedFraction(BigInteger a, BigInteger b)
+        /// <summary>
+        ///  Διαιρεί δύο ακέραιους και επιστρέφει το πηλίκο και το υπόλοιπο
+        /// </summary>
+        public static (BigInteger quotient, BigInteger remainder) Division(BigInteger a, BigInteger b)
         {
-            var result = a / b;
+            var quotient = a / b;
             var remainder = a % b;
 
-            return (result, remainder);
+            return (quotient, remainder);
         }
 
-        // υπολογισμός του a1 + b1/b2 σε κλάσμα
+        /// <summary>
+        /// υπολογισμός του a1 + b1/b2 σε κλάσμα
+        /// </summary>
         public static (BigInteger numerator, BigInteger denominator) CalcFraction(BigInteger a1, BigInteger b1, BigInteger b2)
         {
             BigInteger numerator, denominator;
@@ -191,7 +174,9 @@ namespace RSACalculator
             }
         }
 
-        // υπολογισμός του a1 + b1/(b2/b3) σε κλάσμα
+        /// <summary>
+        ///  υπολογισμός του a1 + b1/(b2/b3) σε κλάσμα
+        /// </summary>
         public static (BigInteger numerator, BigInteger denominator) CalcFraction(BigInteger a1, BigInteger b1, (BigInteger b2, BigInteger b3) c)
         {
             BigInteger numerator, denominator;
@@ -215,93 +200,37 @@ namespace RSACalculator
             }
         }
 
-        // υπολογισμός μιας ContinuedFraction
+        /// <summary>
+        ///  υπολογισμός μιας ContinuedFraction και επιστροφή της με μορφή κλάσματος
+        /// </summary>
         public static (BigInteger numerator, BigInteger denominator) CalcContinuedFraction(List<BigInteger> numbers)
         {
             (BigInteger numerator, BigInteger denominator) result = new (0, 0);
             for (var i = numbers.Count-1; i >= 0; i--)
             {
                 if (i == numbers.Count - 1)
-                {
                     result = CalcFraction(numbers[i], 0, (1, 1));
-                }
                 else
-                {
                     result = CalcFraction(numbers[i], 1, (result.numerator, result.denominator));
-                }
             }
             return result;
         }
 
-        public static BigInteger Sqrt(BigInteger n)
-        {
-            if (n == 0) return 0;
-            if (n > 0)
-            {
-                int bitLength = Convert.ToInt32(Math.Ceiling(BigInteger.Log(n, 2)));
-                BigInteger root = BigInteger.One << (bitLength / 2);
-
-                while (!isSqrt(n, root))
-                {
-                    root += n / root;
-                    root /= 2;
-                }
-
-                return root;
-            }
-
-            throw new ArithmeticException("NaN");
-        }
-
-        private static bool isSqrt(BigInteger n, BigInteger root)
-        {
-            BigInteger lowerBound = root * root;
-            BigInteger upperBound = (root + 1) * (root + 1);
-
-            return (n >= lowerBound && n < upperBound);
-        }
-
-        public static string TryFullDecrypt(string text, BigInteger p, BigInteger q, BigInteger e)
-        {
-            try
-            {
-                // encryption
-                BigInteger m = StringToNumber(text);
-                BigInteger n = p * q;
-
-                if (m >= n)
-                    throw new Exception("m is bigger than n");
-
-                BigInteger f_n = (p - 1) * (q - 1);
-                BigInteger d = ModInverse(e, f_n);
-                var c = Encrypt(m, e, n);
-
-                // encryption
-                m = Decrypt(c, d, n);
-                var result = NumberToString(m);
-
-                throw new Exception(result);
-
-                return result;
-            }
-            catch (ArgumentNullException)
-            {
-                //Catch this exception in case the encryption did
-                //not succeed.
-                Console.WriteLine("routine failed.");
-                return "";
-            }
-        }
-
+        /// <summary>
+        /// Μετατρέπει ένα κείμενο σε πίνακα από bytes και τον πίνακα σε μεγάλο ακέραιο
+        /// </summary>
         public static BigInteger StringToNumber(string text)
         {
             var bytes = Encoding.UTF8.GetBytes(text);
             Array.Reverse(bytes);
-            var number = new BigInteger(bytes); //126943972912743
+            var number = new BigInteger(bytes);
 
             return number;
         }
 
+        /// <summary>
+        /// Μετατρέπει ένα μεγάλο ακέραιο σε πίνακα από bytes και τον πίνακα σε κείμενο
+        /// </summary>
         public static string NumberToString(BigInteger number)
         {
             byte[] bytes = number.ToByteArray();
@@ -311,11 +240,17 @@ namespace RSACalculator
             return text;
         }
 
+        /// <summary>
+        /// Κρυπτογραφεί ένα μήνυμα με τον RSA αλγόριθμο
+        /// </summary>
         private static BigInteger Encrypt(BigInteger m, BigInteger e, BigInteger n)
         {
             return BigInteger.ModPow(m, e, n);
         }
 
+        /// <summary>
+        /// Αποκρυπτογραφεί ένα μήνυμα με τον RSA αλγόριθμο
+        /// </summary>
         private static BigInteger Decrypt(BigInteger c, BigInteger d, BigInteger n)
         {
             return BigInteger.ModPow(c, d, n);
@@ -351,172 +286,6 @@ namespace RSACalculator
             if (t < 0) t = t + n;
             return t;
         }
-
-
-
-
-        public static void TestRSA(string text)
-        {
-            try
-            {
-                //Create a UnicodeEncoder to convert between byte array and string.
-                UnicodeEncoding ByteConverter = new UnicodeEncoding();
-
-                //Create byte arrays to hold original, encrypted, and decrypted data.
-                byte[] dataToEncrypt = ByteConverter.GetBytes(text);
-                byte[] encryptedData;
-                byte[] decryptedData;
-
-                //Create a new instance of RSACryptoServiceProvider to generate
-                //public and private key data.
-                using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
-                {
-
-                    var p = BigInteger.Parse("17");
-                    var q = BigInteger.Parse("19");
-                    var e = BigInteger.Parse("5");
-                    BigInteger n = p * q;
-                    BigInteger f_n = (p - 1) * (q - 1);
-                    BigInteger d = ModInverse(e, f_n);
-
-                    //Pass the data to ENCRYPT, the public key information 
-                    //(using RSACryptoServiceProvider.ExportParameters(false),
-                    //and a boolean flag specifying no OAEP padding.
-                    encryptedData = RSAEncrypt(dataToEncrypt, RSA.ExportParameters(false), false);
-
-                    //Pass the data to DECRYPT, the private key information 
-                    //(using RSACryptoServiceProvider.ExportParameters(true),
-                    //and a boolean flag specifying no OAEP padding.
-                    decryptedData = RSADecrypt(encryptedData, RSA.ExportParameters(true), false);
-                    //decryptedData = RSADecrypt(encryptedData, parameters, false);
-
-                    //Display the decrypted plaintext to the console. 
-                    Console.WriteLine("Decrypted plaintext: {0}", ByteConverter.GetString(decryptedData));
-                }
-            }
-            catch (ArgumentNullException)
-            {
-                //Catch this exception in case the encryption did
-                //not succeed.
-                Console.WriteLine("Encryption failed.");
-            }
-        }
-        public static byte[] RSAEncrypt(byte[] DataToEncrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
-        {
-            try
-            {
-                byte[] encryptedData;
-                //Create a new instance of RSACryptoServiceProvider.
-                using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
-                {
-
-                    //Import the RSA Key information. This only needs
-                    //to include the public key information.
-                    RSA.ImportParameters(RSAKeyInfo);
-
-                    //Encrypt the passed byte array and specify OAEP padding.  
-                    //OAEP padding is only available on Microsoft Windows XP or
-                    //later.  
-                    encryptedData = RSA.Encrypt(DataToEncrypt, DoOAEPPadding);
-                }
-                return encryptedData;
-            }
-            //Catch and display a CryptographicException  
-            //to the console.
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.Message);
-
-                return null;
-            }
-        }
-
-        public static byte[] RSADecrypt(byte[] DataToDecrypt, RSAParameters RSAKeyInfo, bool DoOAEPPadding)
-        {
-            try
-            {
-                byte[] decryptedData;
-                //Create a new instance of RSACryptoServiceProvider.
-                using (RSACryptoServiceProvider RSA = new RSACryptoServiceProvider())
-                {
-                    //Import the RSA Key information. This needs
-                    //to include the private key information.
-                    RSA.ImportParameters(RSAKeyInfo);
-
-                    //Decrypt the passed byte array and specify OAEP padding.  
-                    //OAEP padding is only available on Microsoft Windows XP or
-                    //later.  
-                    decryptedData = RSA.Decrypt(DataToDecrypt, DoOAEPPadding);
-                }
-                return decryptedData;
-            }
-            //Catch and display a CryptographicException  
-            //to the console.
-            catch (CryptographicException e)
-            {
-                Console.WriteLine(e.ToString());
-
-                return null;
-            }
-        }
-
-
-        private static RSAParameters Create(byte[] p, byte[] q, byte[] exponent, byte[] modulus)
-        {
-            var addlParameters = GetFullPrivateParameters(
-                p: new BigInteger(CopyAndReverse(p)),
-                q: new BigInteger(CopyAndReverse(q)),
-                e: new BigInteger(CopyAndReverse(exponent)),
-                modulus: new BigInteger(CopyAndReverse(modulus)));
-
-            return new RSAParameters
-            {
-                P = p,
-                Q = q,
-                Exponent = exponent,
-                Modulus = modulus,
-                D = addlParameters.D,
-                DP = addlParameters.DP,
-                DQ = addlParameters.DQ,
-                InverseQ = addlParameters.InverseQ,
-            };
-        }
-
-        private static RSAParameters GetFullPrivateParameters(BigInteger p, BigInteger q, BigInteger e, BigInteger modulus)
-        {
-            var n = p * q;
-            var phiOfN = (p - 1) * (q - 1);
-
-            var d = ModInverse(e, phiOfN);
-            //Assert.Equal(1, (d * e) % phiOfN);
-
-            var dp = d % (p - 1);
-            var dq = d % (q - 1);
-
-            var qInv = ModInverse(q, p);
-            //Assert.Equal(1, (qInv * q) % p);
-
-            return new RSAParameters
-            {
-                D = CopyAndReverse(d.ToByteArray()),
-                DP = CopyAndReverse(dp.ToByteArray()),
-                DQ = CopyAndReverse(dq.ToByteArray()),
-                InverseQ = CopyAndReverse(qInv.ToByteArray()),
-            };
-        }
-
-        private static byte[] CopyAndReverse(byte[] data)
-        {
-            byte[] reversed = new byte[data.Length];
-            Array.Copy(data, 0, reversed, 0, data.Length);
-            Array.Reverse(reversed);
-            return reversed;
-        }
-
-       
-
-
-
 
     }
 }
