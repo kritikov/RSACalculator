@@ -110,7 +110,7 @@ namespace RSACalculator
                     var m = Decrypt(c, d, n);
                     string result = NumberToString(m);
 
-                    // αν τα πρώτα 10 bytes αντιστοιχούν σε ASCII τότε το μήνυμα μάλλον βρέθηκε
+                    // αν οι 10 πρώτοι χαρατήρες του Μ αντιστοιχούν σε ASCII τότε το μήνυμα μάλλον βρέθηκε
                     if (result[0] >= 0 && result[0] <= 255 &&
                         result[1] >= 0 && result[1] <= 255 &&
                         result[2] >= 0 && result[2] <= 255 &&
@@ -230,22 +230,17 @@ namespace RSACalculator
         }
 
         /// <summary>
-        /// Calculates the modular multiplicative inverse of <paramref name="a"/> modulo <paramref name="m"/>
-        /// using the extended Euclidean algorithm.
+        /// Υπολογίζει το d από την σχέση ισοτιμίας 
         /// </summary>
-        /// <remarks>
-        /// This implementation comes from the pseudocode defining the inverse(a, n) function at
-        /// https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm
-        /// </remarks>
-        public static BigInteger ModInverse(BigInteger a, BigInteger n)
+        public static BigInteger ModInverse(BigInteger e, BigInteger f_n)
         {
-            BigInteger t = 0, nt = 1, r = n, nr = a;
+            BigInteger t = 0, nt = 1, r = f_n, nr = e;
 
-            if (n < 0)
-                n = -n;
+            if (f_n < 0)
+                f_n = -f_n;
 
-            if (a < 0)
-                a = n - (-a % n);
+            if (e < 0)
+                e = f_n - (-e % f_n);
 
             while (nr != 0)
             {
@@ -255,8 +250,8 @@ namespace RSACalculator
                 tmp = nr; nr = r - quot * nr; r = tmp;
             }
 
-            if (r > 1) throw new ArgumentException(nameof(a) + " is not convertible.");
-            if (t < 0) t = t + n;
+            if (r > 1) throw new ArgumentException(nameof(e) + " is not convertible.");
+            if (t < 0) t = t + f_n;
             return t;
         }
 
