@@ -43,7 +43,7 @@ namespace RSACalculator
             TryDecrypt2();
         }
 
-
+        // Αποκρυπτογράφηση 1ου μηνύματος
         public static void TryDecrypt1()
         {
             try
@@ -79,6 +79,7 @@ namespace RSACalculator
             }
         }
 
+        // Αποκρυπτογράφηση 2ου μηνύματος
         public static void TryDecrypt2()
         {
             try
@@ -148,7 +149,7 @@ namespace RSACalculator
         }
 
         /// <summary>
-        ///  υπολογισμός του a + b/(c1/c2) σε κλάσμα
+        ///  υπολογισμός του a + b/(c1/c2) σε μορφή κλάσματος
         /// </summary>
         public static (BigInteger numerator, BigInteger denominator) CalcFraction(BigInteger a, BigInteger b, (BigInteger c1, BigInteger c2) c)
         {
@@ -174,7 +175,7 @@ namespace RSACalculator
         }
 
         /// <summary>
-        ///  υπολογισμός μιας ContinuedFraction και επιστροφή της με μορφή κλάσματος
+        ///  υπολογισμός μιας Continued Fraction και επιστροφή της με μορφή κλάσματος
         /// </summary>
         public static (BigInteger numerator, BigInteger denominator) CalcContinuedFraction(List<BigInteger> numbers)
         {
@@ -254,7 +255,5 @@ namespace RSACalculator
             if (t < 0) t = t + f_n;
             return t;
         }
-
-    
     }
 }

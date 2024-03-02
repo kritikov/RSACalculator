@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:RSACalculator"
         mc:Ignorable="d"
-        Title="MainWindow" Height="260" Width="554" WindowStartupLocation="CenterScreen">
+        Title="Decryptor" Height="260" Width="554" WindowStartupLocation="CenterScreen">
     <Grid>
         <Button Content="ερώτημα 1" HorizontalAlignment="Left" Margin="163,0,0,0" VerticalAlignment="Center" Click="Question1_Click" Height="52" Width="96"/>
         <Button Content="ερώτημα 2" HorizontalAlignment="Left" Margin="277,0,0,0" VerticalAlignment="Center" Click="Question2_Click" Height="52" Width="88"/>
